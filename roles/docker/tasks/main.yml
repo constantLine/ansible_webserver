@@ -1,0 +1,35 @@
+---
+- name: Ensure Docker is installed
+  apt:
+    name: docker.io
+    state: present
+    update_cache: yes
+
+- name: Ensure Docker Compose is installed
+  apt:
+    name: docker-compose
+    state: present
+    update_cache: yes
+
+- name: Create application directory
+  file:
+    path: "{{ app_path }}"
+    state: directory
+    mode: '0755'
+
+- name: Distribute docker-compose.yml
+  copy:
+    src: files/docker-compose.yml
+    dest: "{{ docker_compose_file }}"
+    mode: '0644'
+
+- name: Distribute Dockerfile for PHP customization
+  copy:
+    src: ansible/roles/app/templates/Dockerfile
+    dest: "{{ app_path }}/Dockerfile"
+    mode: '0644'
+
+- name: Start Docker Compose services
+  command: docker-compose up -d --build
+  args:
+    chdir: "{{ app_path }}"

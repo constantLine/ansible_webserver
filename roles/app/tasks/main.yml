@@ -1,0 +1,23 @@
+---
+- name: Generate Nginx config
+  copy:
+    src: ansible/roles/docker/templates/nginx.conf
+    dest: "{{ nginx_config_path }}"
+    mode: '0644'
+  notify: restart nginx
+
+- name: Ensure Nginx config is linked
+  file:
+    src: "{{ nginx_config_path }}"
+    dest: "{{ nginx_link_path }}"
+    state: link
+
+- name: Ensure Nginx is started
+  service:
+    name: nginx
+    state: started
+
+- name: Ensure Docker Compose services are running
+  command: docker-compose up -d
+  args:
+    chdir: "{{ app_path }}"

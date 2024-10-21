@@ -1,0 +1,20 @@
+---
+- name: Deploy dockerized web application with Nginx, PHP, and MySQL
+  hosts: webserver
+  become: true
+
+  vars:
+    app_path: /opt/webapp
+    docker_compose_file: "{{ app_path }}/docker-compose.yml"
+    nginx_config_path: /etc/nginx/sites-available/webapp
+    nginx_link_path: /etc/nginx/sites-enabled/webapp
+
+  roles:
+    - docker
+    - app
+
+  handlers:
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
